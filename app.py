@@ -3,6 +3,12 @@ import datetime
 import time
 import requests
 
+
+# import streamlit as st from streamlit_autorefresh 
+# import st_autorefresh 
+# Run the autorefresh every second and stop after a certain number of refreshes count 
+# = st_autorefresh(interval=1000, limit=100, key="refresh_counter") # Your app logic here 
+
 # st.title('Kia ora')
 
 # Function to display the current time as a flip clock
