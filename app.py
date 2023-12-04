@@ -2,6 +2,7 @@ import streamlit as st
 import datetime
 import time
 import requests
+import streamlit.components.v1 as components
 
 
 # import streamlit as st from streamlit_autorefresh 
@@ -11,16 +12,30 @@ import requests
 
 # st.title('Kia ora')
 
+st.set_page_config(
+    page_title="Ex-stream-ly Cool App",
+    page_icon="🧊",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "# This is a header. This is an *extremely* cool app!"
+    }
+)
+
 # Function to display the current time as a flip clock
 def flip_clock():
     current_time = datetime.datetime.now().strftime("%H:%M:%S")
     st.header(current_time)
+    # st.rerun()
     
 
 
 
 
 # Function to fetch the weather from Auckland
+# https://openweathermap.org/current
 def get_auckland_weather():
     api_key = "9da1e341daff5763b692c09221e1ec0e"
     city = "Auckland"
@@ -30,30 +45,36 @@ def get_auckland_weather():
     if response.status_code == 200:
         weather_description = data['weather'][0]['description']
         temperature = data['main']['temp']
-        st.write(f"Weather in Auckland:") 
-        st.header(f"{weather_description}") 
-        st.write("Temperature:")
-        st.header(f"{temperature}°C")
+        feelslike = data['main']['feels_like']
+        humidity = data['main']['humidity']
+        wind = data['wind']['speed']
+
+        st.metric(label="Temperature", value=f"{temperature}°C", delta="none")
+        st.metric(label="Weather in Auckland", value=f"{weather_description}", delta="none")
+        st.metric(label="Feels Like", value=f"{feelslike}°C", delta="none")
+        st.metric(label="Humidity", value=f"{humidity}%", delta="none")
+        st.metric(label="Wind", value=f"{wind}m/s", delta="none")
+
     else:
         st.write("Failed to retrieve weather data")
 
-def weather_map():
-    api_key = "9da1e341daff5763b692c09221e1ec0e"
-    # Zoom Level 
-    z = 7
-    # number of x tile coordinate
-    x = 0
-    # number of y tile coordinate.
-    y = 16
-    layer = "precipitation_new"
-    url = f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={api_key}"
-    response = requests.get(url)
-    data = response.json()
+# def weather_map():
+#     api_key = "9da1e341daff5763b692c09221e1ec0e"
+#     # Zoom Level 
+#     z = 7
+#     # number of x tile coordinate
+#     x = 0
+#     # number of y tile coordinate.
+#     y = 16
+#     layer = "precipitation_new"
+#     url = f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={api_key}"
+#     response = requests.get(url)
+#     data = response.json()
     #if response.status_code == 200:
         
     #else:
         #st.write("Failed to retrieve weather data")
-    
+
 
 # Display the flip clock and Auckland weather
 
@@ -64,6 +85,8 @@ with col1:
 
 with col2:
     get_auckland_weather()
+
+
 
 
 # In this code, we use Streamlit to create a webpage, the `datetime` and `time` modules to display the current time, 
