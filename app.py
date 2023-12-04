@@ -13,8 +13,8 @@ import streamlit.components.v1 as components
 # st.title('Kia ora')
 
 st.set_page_config(
-    page_title="Ex-stream-ly Cool App",
-    page_icon="🧊",
+    page_title="Weather",
+    page_icon=":thumb",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
@@ -23,6 +23,8 @@ st.set_page_config(
         'About': "# This is a header. This is an *extremely* cool app!"
     }
 )
+
+
 
 # Function to display the current time as a flip clock
 def flip_clock():
@@ -58,34 +60,36 @@ def get_auckland_weather():
     else:
         st.write("Failed to retrieve weather data")
 
-# def weather_map():
-#     api_key = "9da1e341daff5763b692c09221e1ec0e"
-#     # Zoom Level 
-#     z = 7
-#     # number of x tile coordinate
-#     x = 0
-#     # number of y tile coordinate.
-#     y = 16
-#     layer = "precipitation_new"
-#     url = f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={api_key}"
-#     response = requests.get(url)
-#     data = response.json()
-    #if response.status_code == 200:
-        
-    #else:
-        #st.write("Failed to retrieve weather data")
-
+def weather_map():
+    api_key = "9da1e341daff5763b692c09221e1ec0e"
+    # Zoom Level 
+    z = 7
+    # number of x tile coordinate
+    x = 0
+    # number of y tile coordinate.
+    y = 16
+    layer = "precipitation_new"
+    url = f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={api_key}"
+    response = requests.get(url)
+    data = response.json()
+    if response.status_code == 200:
+        st.write("test")
+    else:
+        st.write("Failed to retrieve weather data")    
 
 # Display the flip clock and Auckland weather
 
-col1, col2 = st.columns(2)
+col1, col2= st.columns(2)
 
 with col1:
     flip_clock()
+    
 
 with col2:
     get_auckland_weather()
 
+# with col3:
+    # weather_map()
 
 
 
