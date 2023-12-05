@@ -3,7 +3,10 @@ import datetime
 import time
 import requests
 import streamlit.components.v1 as components
-
+import openweathermapy.core as owm
+import folium
+import json
+import pydeck as pdk
 
 # import streamlit as st from streamlit_autorefresh 
 # import st_autorefresh 
@@ -24,18 +27,12 @@ st.set_page_config(
     }
 )
 
-
-
 # Function to display the current time as a flip clock
 def flip_clock():
     current_time = datetime.datetime.now().strftime("%H:%M:%S")
     st.header(current_time)
     # st.rerun()
     
-
-
-
-
 # Function to fetch the weather from Auckland
 # https://openweathermap.org/current
 def get_auckland_weather():
@@ -59,44 +56,106 @@ def get_auckland_weather():
 
     else:
         st.write("Failed to retrieve weather data")
+  
 
-def weather_map():
-    api_key = "9da1e341daff5763b692c09221e1ec0e"
-    # Zoom Level 
-    z = 7
-    # number of x tile coordinate
-    x = 0
-    # number of y tile coordinate.
-    y = 16
-    layer = "precipitation_new"
-    url = f"https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={api_key}"
-    response = requests.get(url)
-    data = response.json()
-    if response.status_code == 200:
-        st.write("test")
-    else:
-        st.write("Failed to retrieve weather data")    
+# Function to fetch weather data from the OpenWeatherMap API
+# api_key = "9da1e341daff5763b692c09221e1ec0e"
+# city = "Auckland"
 
-# Display the flip clock and Auckland weather
+# def fetch_weather_data(city, api_key):
+#     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
+#     response = requests.get(url)
+#     data = json.loads(response.text)
+#     return data
 
-col1, col2= st.columns(2)
+
+# OpenWeather API key (replace 'YOUR_API_KEY' with your actual API key)
+
+API_KEY = '9da1e341daff5763b692c09221e1ec0e'
+AUCKLAND_COORDS = {'lat': -36.8485, 'lon': 174.7633}
+API_URL = 'http://api.openweathermap.org/data/2.5/weather'
+
+# Mapbox access token (replace with your own token)
+MAPBOX_TOKEN = "pk.eyJ1IjoiZGV0ZWN0aXZlIiwiYSI6ImNFODJ1VjgifQ.W7Qe05bGseWCOThC3YE4uQ"
+
+# Auckland coordinates
+AUCKLAND_COORDS = {'lat': -36.8485, 'lon': 174.7633}
+
+# OpenWeatherMap API key (replace with your actual key)
+OPENWEATHERMAP_API_KEY = "9da1e341daff5763b692c09221e1ec0e"
+
+# Auckland coordinates
+AUCKLAND_COORDS = {'lat': -36.8485, 'lon': 174.7633}
+
+# Function to get weather data from OpenWeatherMap API
+def get_weather_data(api_key, coords):
+    api_url = 'http://api.openweathermap.org/data/2.5/onecall'
+    params = {
+        'lat': coords['lat'],
+        'lon': coords['lon'],
+        'appid': api_key,
+        'exclude': 'current,minutely,hourly',  # Exclude unnecessary data
+        'units': 'metric'
+    }
+    response = requests.get(api_url, params=params)
+    return response.json()
+
+# Get weather data for Auckland
+weather_data = get_weather_data(OPENWEATHERMAP_API_KEY, AUCKLAND_COORDS)
+
+# Create a PyDeck deck
+deck = pdk.Deck(
+    map_style="mapbox://styles/mapbox/light-v9",
+    initial_view_state=pdk.ViewState(
+        latitude=AUCKLAND_COORDS['lat'],
+        longitude=AUCKLAND_COORDS['lon'],
+        zoom=9,
+        pitch=50,
+    ),
+)
+
+#Display two columns
+col1, col2 = st.columns([3,1], gap="medium")
 
 with col1:
-    flip_clock()
+    # st.map(data=None, latitude=-36.8485, longitude=174.7633, zoom=16)
+    # Check if weather data is available
+    if 'daily' in weather_data:
+    # Extract rain data
+        rain_data = [{'lat': AUCKLAND_COORDS['lat'],
+                  'lon': AUCKLAND_COORDS['lon'],
+                  'rain': day['rain'] if 'rain' in day else 0.0}
+                 for day in weather_data['daily']]
+
+    # Create a PyDeck layer for rain data
+    rain_layer = pdk.Layer(
+        "ScatterplotLayer",
+        data=rain_data,
+        get_position='[lon, lat]',
+        get_radius='rain * 1000',  # Scale the radius for visibility
+        get_fill_color='[0, 0, rain * 255, 150]',  # Use blue color based on rain intensity
+        pickable=True,
+        auto_highlight=True,
+    )
+
+    # Create a PyDeck deck
+    deck = pdk.Deck(
+        map_style="mapbox://styles/mapbox/light-v9",
+        layers=[rain_layer],
+        initial_view_state=pdk.ViewState(
+            latitude=AUCKLAND_COORDS['lat'],
+            longitude=AUCKLAND_COORDS['lon'],
+            zoom=10,
+            pitch=50,
+        ),
+    )
+
+    # Display the PyDeck deck using st.pydeck_chart
+    st.pydeck_chart(deck)
+        # else:
+        #     st.error("Error fetching weather data from OpenWeatherMap.")
     
 
 with col2:
     get_auckland_weather()
 
-# with col3:
-    # weather_map()
-
-
-
-# In this code, we use Streamlit to create a webpage, the `datetime` and `time` modules to display the current time, 
-# and the `requests` module to fetch the weather from the OpenWeather API. Replace `"YOUR_OPENWEATHER_API_KEY"` with your actual OpenWeather API key. 
-# The `get_auckland_weather` function fetches the weather data for Auckland from the OpenWeather API and displays the weather description and temperature 
-# in Celsius.
-# Please note that you need to sign up for the OpenWeather API and obtain an API key to use the weather data retrieval functionality.
-# The search results did not provide a direct example of displaying the time and weather in separate columns, but the provided Python code should 
-# help you achieve this using Streamlit and the OpenWeather API.
