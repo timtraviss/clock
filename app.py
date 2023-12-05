@@ -49,6 +49,8 @@ def get_auckland_weather():
         wind = data['wind']['speed']
         # rain = data['rain']['rain.1h']
 
+        current_time = datetime.datetime.now().strftime("%H:%M:%S")
+        st.header(current_time)    
         st.metric(label="Temperature", value=f"{temperature}°C", delta="none")
         st.metric(label="Weather in Auckland", value=f"{weather_description}", delta="none")
         st.metric(label="Feels Like", value=f"{feelslike}°C", delta="none")
