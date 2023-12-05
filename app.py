@@ -47,30 +47,19 @@ def get_auckland_weather():
         feelslike = data['main']['feels_like']
         humidity = data['main']['humidity']
         wind = data['wind']['speed']
+        # rain = data['rain']['rain.1h']
 
         st.metric(label="Temperature", value=f"{temperature}°C", delta="none")
         st.metric(label="Weather in Auckland", value=f"{weather_description}", delta="none")
         st.metric(label="Feels Like", value=f"{feelslike}°C", delta="none")
         st.metric(label="Humidity", value=f"{humidity}%", delta="none")
         st.metric(label="Wind", value=f"{wind}m/s", delta="none")
+        # st.metric(label="Rain",value=f"{rain}1h/mm",delta="none")
 
     else:
         st.write("Failed to retrieve weather data")
   
-
-# Function to fetch weather data from the OpenWeatherMap API
-# api_key = "9da1e341daff5763b692c09221e1ec0e"
-# city = "Auckland"
-
-# def fetch_weather_data(city, api_key):
-#     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
-#     response = requests.get(url)
-#     data = json.loads(response.text)
-#     return data
-
-
 # OpenWeather API key (replace 'YOUR_API_KEY' with your actual API key)
-
 API_KEY = '9da1e341daff5763b692c09221e1ec0e'
 AUCKLAND_COORDS = {'lat': -36.8485, 'lon': 174.7633}
 API_URL = 'http://api.openweathermap.org/data/2.5/weather'
@@ -90,6 +79,10 @@ AUCKLAND_COORDS = {'lat': -36.8485, 'lon': 174.7633}
 # Function to get weather data from OpenWeatherMap API
 def get_weather_data(api_key, coords):
     api_url = 'http://api.openweathermap.org/data/2.5/onecall'
+    z = 10
+    x = 16
+    y = 16
+    # api_url = 'https://maps.openweathermap.org/maps/2.0/weather/1h/PARAIN/{z}/{x}/{y}?date=1618898990&appid={OPENWEATHERMAP_API_KEY}'
     params = {
         'lat': coords['lat'],
         'lon': coords['lon'],
@@ -116,6 +109,10 @@ deck = pdk.Deck(
 
 #Display two columns
 col1, col2 = st.columns([3,1], gap="medium")
+
+# Create a st.button to reload the page
+if st.button("Reload Page"):
+    st.experimental_rerun()
 
 with col1:
     # st.map(data=None, latitude=-36.8485, longitude=174.7633, zoom=16)
