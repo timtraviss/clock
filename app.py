@@ -144,7 +144,7 @@ with col1:
         "ScatterplotLayer",
         data=rain_data,
         get_position='[lon, lat]',
-        get_radius='rain * 1',  # Scale the radius for visibility
+        get_radius='rain * 1000',  # Scale the radius for visibility
         get_fill_color='[0, 0, rain * 255, 150]',  # Use blue color based on rain intensity
         pickable=True,
         auto_highlight=True,
